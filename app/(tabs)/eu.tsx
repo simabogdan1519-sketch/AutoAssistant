@@ -79,31 +79,31 @@ export default function EuScreen() {
             icon="card-outline"
             title="Permis de conducere"
             subtitle="ADAUGĂ · 10 ANI VALIDITATE"
-            onPress={() => {}}
+            onPress={() => router.push('/permis')}
           />
           <MenuRow
             icon="notifications-outline"
             title="Notificări"
             subtitle="REMINDERE · EXPIRĂRI"
-            onPress={() => {}}
+            onPress={() => router.push('/notificari')}
           />
           <MenuRow
             icon="cloud-upload-outline"
             title="Backup date"
             subtitle="EXPORT JSON · GOOGLE DRIVE"
-            onPress={() => {}}
+            onPress={() => router.push('/backup')}
           />
           <MenuRow
             icon="book-outline"
             title="Ghid legislativ RO"
             subtitle="REDUCERE 50% · RESET PUNCTE"
-            onPress={() => {}}
+            onPress={() => router.push('/ghid')}
           />
           <MenuRow
             icon="information-circle-outline"
             title="Despre aplicație"
-            subtitle="V1.0 · BUILD 2026.04.18"
-            onPress={() => {}}
+            subtitle="V1.0 · BUILD 2026.04.21"
+            onPress={() => router.push('/despre')}
           />
         </View>
       </ScrollView>

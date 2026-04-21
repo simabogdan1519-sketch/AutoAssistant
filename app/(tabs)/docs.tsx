@@ -5,10 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { Text } from '@/components/Text';
 import { Header } from '@/components/Header';
 import { useStore } from '@/lib/store';
@@ -40,6 +43,109 @@ export default function DocsScreen() {
     if (filter === 'all') return documents;
     return documents.filter((d) => d.type === filter);
   }, [documents, filter]);
+
+  const exportPDF = async () => {
+    if (cars.length === 0) {
+      Alert.alert('Nicio mașină', 'Adaugă cel puțin o mașină ca să poți exporta.');
+      return;
+    }
+
+    const activeCar = cars[0];
+    const carDocs = documents.filter((d) => d.carId === activeCar.id);
+
+    const docsHtml = carDocs
+      .map((d) => {
+        const status = getExpiryStatus(d.expiryDate);
+        const statusLabel = status === 'ok' ? 'VALABIL' : status === 'warn' ? 'EXPIRĂ CURÂND' : status === 'bad' ? 'URGENT' : 'EXPIRAT';
+        const statusColor = status === 'ok' ? '#2d7a4f' : status === 'warn' ? '#c07a00' : '#b23a3a';
+        return `
+          <tr>
+            <td style="padding:12px;border-bottom:1px solid #eee;">
+              <strong>${d.name}</strong><br>
+              <span style="color:#888;font-size:11px;">${(d.type || '').toUpperCase()} ${d.issuer ? '· ' + d.issuer : ''}</span>
+            </td>
+            <td style="padding:12px;border-bottom:1px solid #eee;text-align:right;">
+              ${d.expiryDate ? formatShortDate(d.expiryDate) : '—'}
+            </td>
+            <td style="padding:12px;border-bottom:1px solid #eee;text-align:right;">
+              <span style="color:${statusColor};font-size:11px;font-weight:600;">${statusLabel}</span>
+            </td>
+          </tr>
+        `;
+      })
+      .join('');
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: -apple-system, sans-serif; margin: 0; padding: 32px; color: #111; }
+          h1 { font-size: 28px; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: -1px; }
+          h1 em { font-style: italic; color: #7a9c00; font-weight: 400; }
+          .header { border-bottom: 2px solid #d4ff3a; padding-bottom: 16px; margin-bottom: 24px; }
+          .meta { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1.5px; }
+          .car-card { background: #f8f8f3; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+          .car-name { font-size: 22px; font-weight: 700; margin: 4px 0; }
+          .car-plate { font-family: monospace; color: #666; }
+          table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+          th { background: #f5f5f2; text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+          .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; text-align: center; font-size: 10px; color: #999; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="meta">AutoAssistant · Export documente</div>
+          <h1>${activeCar.make} <em>${activeCar.model}</em></h1>
+          <div class="meta">Generat la ${new Date().toLocaleDateString('ro-RO')} · ${new Date().toLocaleTimeString('ro-RO')}</div>
+        </div>
+
+        <div class="car-card">
+          <div class="meta">Mașină</div>
+          <div class="car-name">${activeCar.make} ${activeCar.model}</div>
+          <div class="car-plate">${activeCar.plate} · ${activeCar.year} · ${activeCar.fuelType} · ${activeCar.currentMileage.toLocaleString('ro-RO')} km</div>
+        </div>
+
+        <h2 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; color: #666;">
+          Documente (${carDocs.length})
+        </h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th style="text-align:right;">Expiră</th>
+              <th style="text-align:right;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${docsHtml || '<tr><td colspan="3" style="padding:20px;text-align:center;color:#999;">Niciun document adăugat</td></tr>'}
+          </tbody>
+        </table>
+
+        <div class="footer">
+          AutoAssistant · Generat ${new Date().toISOString().slice(0, 10)}<br>
+          Datele sunt stocate local pe dispozitiv — nicio informație nu este partajată online.
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Partajează sau salvează PDF-ul',
+          UTI: 'com.adobe.pdf',
+        });
+      } else {
+        Alert.alert('Gata', `PDF salvat: ${uri}`);
+      }
+    } catch (err) {
+      Alert.alert('Eroare export', String(err));
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -127,7 +233,7 @@ export default function DocsScreen() {
       <TouchableOpacity
         activeOpacity={0.7}
         style={styles.exportBanner}
-        onPress={() => {/* TODO: export PDF */}}
+        onPress={exportPDF}
       >
         <Ionicons name="cloud-upload-outline" size={18} color={Colors.accent} />
         <View style={{ flex: 1 }}>

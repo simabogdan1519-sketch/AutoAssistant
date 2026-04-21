@@ -73,6 +73,11 @@ export default function RootLayout() {
         <Stack.Screen name="fine/new" options={{ presentation: 'modal' }} />
         <Stack.Screen name="document/new" options={{ presentation: 'modal' }} />
         <Stack.Screen name="expense/new" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="permis" />
+        <Stack.Screen name="notificari" />
+        <Stack.Screen name="backup" />
+        <Stack.Screen name="ghid" />
+        <Stack.Screen name="despre" />
       </Stack>
     </GestureHandlerRootView>
   );
