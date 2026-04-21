@@ -44,6 +44,15 @@ jobs:
       - name: Expo prebuild (generate Android native project)
         run: npx expo prebuild --platform android --clean
 
+      - name: Pin Gradle to 8.10.2 (fix incompatibility with Gradle 9)
+        run: |
+          # Gradle 9 are probleme cu react-native-reanimated 4.x și alte plugin-uri
+          # Fixăm la 8.10.2 care e stabil și testat cu RN 0.83 + SDK 35
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.10.2-bin.zip|' \
+            android/gradle/wrapper/gradle-wrapper.properties
+          echo "=== gradle-wrapper.properties ==="
+          cat android/gradle/wrapper/gradle-wrapper.properties
+
       - name: Setup keystore
         run: |
           if [ -z "${{ secrets.KEYSTORE_BASE64 }}" ]; then
