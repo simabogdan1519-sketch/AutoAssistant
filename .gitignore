@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native folders (generate automat de `expo prebuild` la fiecare build)
+android/
+ios/
+
+# Native artifacts
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Local env files
+.env*.local
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Builds
+*.apk
+*.aab
+*.ipa
+
+# Logs
+logs
+*.log
