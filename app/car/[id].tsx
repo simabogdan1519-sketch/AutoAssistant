@@ -31,10 +31,10 @@ export default function CarDetailScreen() {
 
   if (!car) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <Header title="Eroare" showBack />
         <View style={styles.center}>
-          <Text>Mașina nu există.</Text>
+          <Text variant="body" color={Colors.inkDim}>Mașina nu există.</Text>
         </View>
       </SafeAreaView>
     );
@@ -58,6 +58,23 @@ export default function CarDetailScreen() {
     );
   };
 
+  const handleMenu = () => {
+    Alert.alert(
+      'Opțiuni',
+      car.make + ' ' + car.model,
+      [
+        { text: 'Editează', onPress: () => router.push(`/car/edit/${car.id}`) },
+        { text: 'Șterge', style: 'destructive', onPress: handleDelete },
+        { text: 'Anulează', style: 'cancel' },
+      ]
+    );
+  };
+
+  // Fix pentru VIN safe display
+  const vinDisplay = car.vin && car.vin.length > 0
+    ? `...${car.vin.slice(-6)}`
+    : null;
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Header
@@ -65,8 +82,8 @@ export default function CarDetailScreen() {
         titleAccent={car.model}
         eyebrow={car.plate}
         showBack
-        rightIcon="trash-outline"
-        onRightPress={handleDelete}
+        rightIcon="ellipsis-horizontal"
+        onRightPress={handleMenu}
       />
 
       <ScrollView
@@ -79,42 +96,63 @@ export default function CarDetailScreen() {
             <Image source={{ uri: car.profileImage }} style={styles.img} />
           ) : (
             <View style={styles.imgPlaceholder}>
-              <Ionicons name="car-sport-outline" size={64} color={Colors.inkDimmer} />
+              <Ionicons name="car-sport-outline" size={56} color={Colors.inkDimmer} />
             </View>
           )}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push(`/car/edit/${car.id}`)}
+            style={styles.editBtn}
+          >
+            <Ionicons name="create-outline" size={14} color={Colors.ink} />
+            <Text variant="mono" size={10} tracking={1.2} color={Colors.ink}>
+              EDITEAZĂ
+            </Text>
+          </TouchableOpacity>
           <View style={styles.plateBadge}>
-            <Text variant="mono" size={12} color={Colors.accent} tracking={1.2} weight="500">
+            <Text variant="mono" size={11} color={Colors.accent} tracking={1.2} weight="500">
               {car.plate}
             </Text>
           </View>
-          {car.vin && (
+          {vinDisplay && (
             <View style={styles.vinBadge}>
               <Text variant="mono" size={9} color={Colors.inkDim} tracking={1}>
-                VIN · {car.vin.slice(-6).padStart(10, '...')}
+                VIN · {vinDisplay}
               </Text>
             </View>
           )}
         </View>
 
         <View style={styles.specs}>
-          <SpecRow label="Marcă / Model" value={`${car.make} ${car.model}`} />
+          <SpecRow label="Marcă" value={car.make} />
+          <SpecRow label="Model" value={car.model} />
           <SpecRow label="An fabricație" value={String(car.year)} />
           <SpecRow label="Combustibil" value={car.fuelType} />
-          {car.tankCapacity && <SpecRow label="Rezervor" value={`${car.tankCapacity} L`} />}
-          <SpecRow label="Kilometraj" value={`${car.currentMileage.toLocaleString('ro-RO')} KM`} />
+          {car.tankCapacity ? <SpecRow label="Rezervor" value={`${car.tankCapacity} L`} /> : null}
+          <SpecRow label="Kilometraj" value={`${car.currentMileage.toLocaleString('ro-RO')} km`} />
         </View>
 
         <SectionHeader
-          title="Documente / verificări"
+          title={`Documente · ${documents.length}`}
           action="+ ADAUGĂ"
           onAction={() => router.push('/document/new')}
         />
 
         {documents.length === 0 ? (
           <View style={styles.emptyDoc}>
-            <Text variant="mono" size={11} tracking={1} color={Colors.inkDim}>
-              NICIUN DOCUMENT ADĂUGAT
+            <Ionicons name="document-outline" size={32} color={Colors.inkDimmer} />
+            <Text variant="mono" size={11} tracking={1} color={Colors.inkDim} style={{ marginTop: 10 }}>
+              NICIUN DOCUMENT
             </Text>
+            <TouchableOpacity
+              onPress={() => router.push('/document/new')}
+              style={styles.emptyBtn}
+              activeOpacity={0.8}
+            >
+              <Text variant="mono" size={11} tracking={1} color={Colors.accent}>
+                ADAUGĂ PRIMUL →
+              </Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View>
@@ -132,17 +170,24 @@ export default function CarDetailScreen() {
                   <View style={styles.docIcon}>
                     <Ionicons name="document-outline" size={16} color={Colors.ink} />
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text variant="heading" size={14} weight="500">
+                  <View style={styles.docInfo}>
+                    <Text variant="heading" size={14} weight="500" numberOfLines={1}>
                       {d.name}
                     </Text>
-                    <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} style={{ marginTop: 2 }}>
-                      {d.issuer ? `${d.issuer.toUpperCase()} · ` : ''}
-                      {d.expiryDate ? `EXP. ${formatShortDate(d.expiryDate)}` : ''}
+                    <Text
+                      variant="mono"
+                      size={10}
+                      tracking={0.6}
+                      color={Colors.inkDim}
+                      numberOfLines={1}
+                      style={{ marginTop: 2 }}
+                    >
+                      {d.issuer ? d.issuer.toUpperCase() : d.type.toUpperCase()}
+                      {d.expiryDate ? ` · EXP. ${formatShortDate(d.expiryDate)}` : ''}
                     </Text>
                   </View>
                   <View style={[styles.chip, { borderColor: chipColor, backgroundColor: `${chipColor}15` }]}>
-                    <Text variant="mono" size={9} tracking={1.2} color={chipColor} weight="600">
+                    <Text variant="mono" size={9} tracking={1} color={chipColor} weight="600">
                       {d.expiryDate ? formatDaysLeft(daysUntil(d.expiryDate)) : 'OK'}
                     </Text>
                   </View>
@@ -162,7 +207,13 @@ function SpecRow({ label, value }: { label: string; value: string }) {
       <Text variant="mono" size={10} tracking={1.5} color={Colors.inkDim}>
         {label.toUpperCase()}
       </Text>
-      <Text variant="heading" size={14} weight="500">
+      <Text
+        variant="heading"
+        size={14}
+        weight="500"
+        numberOfLines={1}
+        style={{ maxWidth: '60%', textAlign: 'right' }}
+      >
         {value}
       </Text>
     </View>
@@ -191,14 +242,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  editBtn: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    backgroundColor: 'rgba(10,10,10,0.85)',
+    borderWidth: 1,
+    borderColor: Colors.line,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   plateBadge: {
     position: 'absolute',
     bottom: 14,
     left: 14,
-    backgroundColor: 'rgba(10,10,10,0.75)',
+    backgroundColor: 'rgba(10,10,10,0.85)',
     borderWidth: 1,
     borderColor: Colors.line,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
   },
@@ -206,6 +271,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 14,
     right: 14,
+    backgroundColor: 'rgba(10,10,10,0.6)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
   },
   specs: {
     borderTopWidth: 1,
@@ -219,14 +288,23 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.line,
+    gap: 12,
   },
   emptyDoc: {
-    padding: 20,
+    padding: 32,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: Colors.line,
     borderStyle: 'dashed',
     borderRadius: Radius.lg,
+  },
+  emptyBtn: {
+    marginTop: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: Colors.accent,
+    borderRadius: 8,
   },
   docRow: {
     flexDirection: 'row',
@@ -245,6 +323,10 @@ const styles = StyleSheet.create({
     borderColor: Colors.line,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  docInfo: {
+    flex: 1,
+    minWidth: 0,
   },
   chip: {
     paddingHorizontal: 9,

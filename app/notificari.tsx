@@ -169,9 +169,16 @@ export default function NotificariScreen() {
 function ToggleRow({ label, subtitle, value, onToggle }: { label: string; subtitle: string; value: boolean; onToggle: () => void }) {
   return (
     <View style={styles.toggleRow}>
-      <View style={{ flex: 1 }}>
-        <Text variant="heading" size={14} weight="500">{label}</Text>
-        <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} style={{ marginTop: 2 }}>
+      <View style={{ flex: 1, minWidth: 0, marginRight: 12 }}>
+        <Text variant="heading" size={14} weight="500" numberOfLines={1}>{label}</Text>
+        <Text
+          variant="mono"
+          size={10}
+          tracking={0.8}
+          color={Colors.inkDim}
+          numberOfLines={1}
+          style={{ marginTop: 2 }}
+        >
           {subtitle}
         </Text>
       </View>

@@ -127,11 +127,18 @@ function MenuRow({
       <View style={menuStyles.iconWrap}>
         <Ionicons name={icon} size={18} color={Colors.ink} />
       </View>
-      <View style={{ flex: 1 }}>
-        <Text variant="heading" size={14} weight="600">
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text variant="heading" size={14} weight="600" numberOfLines={1}>
           {title}
         </Text>
-        <Text variant="mono" size={10} tracking={1} color={Colors.inkDim} style={{ marginTop: 2 }}>
+        <Text
+          variant="mono"
+          size={10}
+          tracking={1}
+          color={Colors.inkDim}
+          numberOfLines={1}
+          style={{ marginTop: 2 }}
+        >
           {subtitle}
         </Text>
       </View>

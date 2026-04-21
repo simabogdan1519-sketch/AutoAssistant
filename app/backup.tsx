@@ -179,12 +179,12 @@ export default function BackupScreen() {
           <View style={styles.iconLg}>
             <Ionicons name="cloud-upload-outline" size={20} color={Colors.accent} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text variant="heading" size={15} weight="600">
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text variant="heading" size={15} weight="600" numberOfLines={1}>
               Exportă date
             </Text>
-            <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} style={{ marginTop: 2 }}>
-              SALVEAZĂ FIȘIER .JSON (GOOGLE DRIVE, EMAIL, ETC.)
+            <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} numberOfLines={1} style={{ marginTop: 2 }}>
+              SALVEAZĂ FIȘIER .JSON
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color={Colors.inkDim} />
@@ -194,12 +194,12 @@ export default function BackupScreen() {
           <View style={styles.iconLg}>
             <Ionicons name="cloud-download-outline" size={20} color={Colors.accent} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text variant="heading" size={15} weight="600">
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text variant="heading" size={15} weight="600" numberOfLines={1}>
               Importă date
             </Text>
-            <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} style={{ marginTop: 2 }}>
-              RESTABILEȘTE DINTR-UN BACKUP .JSON
+            <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} numberOfLines={1} style={{ marginTop: 2 }}>
+              RESTABILEȘTE DINTR-UN BACKUP
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color={Colors.inkDim} />
@@ -210,11 +210,11 @@ export default function BackupScreen() {
           <View style={[styles.iconLg, { backgroundColor: 'rgba(255,90,79,0.1)' }]}>
             <Ionicons name="trash-outline" size={20} color={Colors.danger} />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text variant="heading" size={15} weight="600" color={Colors.danger}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text variant="heading" size={15} weight="600" color={Colors.danger} numberOfLines={1}>
               Șterge toate datele
             </Text>
-            <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} style={{ marginTop: 2 }}>
+            <Text variant="mono" size={10} tracking={0.8} color={Colors.inkDim} numberOfLines={1} style={{ marginTop: 2 }}>
               IREVERSIBIL · RESET COMPLET
             </Text>
           </View>

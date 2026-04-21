@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Text } from './Text';
-import { Colors, Spacing, Radius } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 
 type Props = {
   title: string;
@@ -32,38 +32,58 @@ export function Header({
             style={styles.backBtn}
             onPress={() => router.back()}
             activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name="chevron-back" size={18} color={Colors.ink} />
           </TouchableOpacity>
         )}
-        <View>
-          {eyebrow && (
-            <Text variant="mono" color={Colors.inkDim} size={9} style={{ marginBottom: 2 }}>
+        <View style={styles.textWrap}>
+          {eyebrow ? (
+            <Text
+              variant="mono"
+              color={Colors.inkDim}
+              size={9}
+              tracking={2}
+              numberOfLines={1}
+              style={{ marginBottom: 2 }}
+            >
               {eyebrow}
             </Text>
-          )}
-          <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-            <Text variant="heading" size={22} style={{ textTransform: 'uppercase' }}>
-              {title}
+          ) : null}
+          <View style={styles.titleRow}>
+            <Text
+              variant="heading"
+              size={22}
+              numberOfLines={1}
+              style={styles.titleMain}
+            >
+              {title.toUpperCase()}
             </Text>
-            {titleAccent && (
-              <Text variant="serif" color={Colors.accent} size={22} style={{ marginLeft: 4 }}>
+            {titleAccent ? (
+              <Text
+                variant="serif"
+                color={Colors.accent}
+                size={22}
+                numberOfLines={1}
+                style={styles.titleAccent}
+              >
                 {titleAccent}
               </Text>
-            )}
+            ) : null}
           </View>
         </View>
       </View>
 
-      {rightIcon && (
+      {rightIcon ? (
         <TouchableOpacity
           style={styles.iconBtn}
           onPress={onRightPress}
           activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Ionicons name={rightIcon} size={18} color={Colors.ink} />
         </TouchableOpacity>
-      )}
+      ) : null}
     </View>
   );
 }
@@ -76,12 +96,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
     flex: 1,
+    minWidth: 0,
+  },
+  textWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexWrap: 'nowrap',
+  },
+  titleMain: {
+    flexShrink: 1,
+  },
+  titleAccent: {
+    marginLeft: 4,
+    flexShrink: 1,
   },
   backBtn: {
     width: 40,
@@ -92,6 +130,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.line,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   iconBtn: {
     width: 40,
@@ -102,5 +141,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.line,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
 });

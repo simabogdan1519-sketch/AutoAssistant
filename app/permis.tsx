@@ -240,7 +240,15 @@ function SpecRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.specRow}>
       <Text variant="mono" size={10} tracking={1.5} color={Colors.inkDim}>{label.toUpperCase()}</Text>
-      <Text variant="heading" size={14} weight="500">{value}</Text>
+      <Text
+        variant="heading"
+        size={14}
+        weight="500"
+        numberOfLines={1}
+        style={{ maxWidth: '60%', textAlign: 'right' }}
+      >
+        {value}
+      </Text>
     </View>
   );
 }
@@ -282,6 +290,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.line,
+    gap: 12,
   },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   catChip: {

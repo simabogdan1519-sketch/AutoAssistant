@@ -225,16 +225,28 @@ export default function GhidScreen() {
                 <View style={styles.sectionIcon}>
                   <Ionicons name={section.icon} size={20} color={Colors.accent} />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim}>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim} numberOfLines={1}>
                     {section.eyebrow}
                   </Text>
                   <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 2 }}>
-                    <Text variant="heading" size={18} tracking={-0.5} style={{ textTransform: 'uppercase' }}>
+                    <Text
+                      variant="heading"
+                      size={18}
+                      tracking={-0.5}
+                      numberOfLines={1}
+                      style={{ textTransform: 'uppercase', flexShrink: 1 }}
+                    >
                       {section.title}
                     </Text>
                     {section.titleAccent && (
-                      <Text variant="serif" size={18} color={Colors.accent} style={{ marginLeft: 4 }}>
+                      <Text
+                        variant="serif"
+                        size={18}
+                        color={Colors.accent}
+                        numberOfLines={1}
+                        style={{ marginLeft: 4, flexShrink: 1 }}
+                      >
                         {section.titleAccent}
                       </Text>
                     )}

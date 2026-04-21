@@ -56,14 +56,33 @@ export default function GarajScreen() {
               </View>
               <View style={styles.carInfo}>
                 <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                  <Text variant="heading" size={20} tracking={-0.5} style={{ textTransform: 'uppercase' }}>
+                  <Text
+                    variant="heading"
+                    size={20}
+                    tracking={-0.5}
+                    numberOfLines={1}
+                    style={{ textTransform: 'uppercase', flexShrink: 1 }}
+                  >
                     {car.make}
                   </Text>
-                  <Text variant="serif" size={20} color={Colors.accent} style={{ marginLeft: 4 }}>
+                  <Text
+                    variant="serif"
+                    size={20}
+                    color={Colors.accent}
+                    numberOfLines={1}
+                    style={{ marginLeft: 4, flexShrink: 1 }}
+                  >
                     {car.model}
                   </Text>
                 </View>
-                <Text variant="mono" size={11} color={Colors.inkDim} tracking={1} style={{ marginTop: 2 }}>
+                <Text
+                  variant="mono"
+                  size={11}
+                  color={Colors.inkDim}
+                  tracking={1}
+                  numberOfLines={1}
+                  style={{ marginTop: 2 }}
+                >
                   {car.plate}
                 </Text>
                 <View style={styles.statsRow}>

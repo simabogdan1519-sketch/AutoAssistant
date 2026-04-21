@@ -124,8 +124,8 @@ export default function FinesScreen() {
           carFines.map((fine) => (
             <View key={fine.id} style={[styles.fineCard, fine.paid && { opacity: 0.5 }]}>
               <View style={styles.fineHead}>
-                <View style={{ flex: 1 }}>
-                  <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim}>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim} numberOfLines={1}>
                     {fine.article.toUpperCase()}
                     {fine.paid && ' · PLĂTITĂ' + (fine.paidHalf ? ' 50%' : '')}
                   </Text>
@@ -133,12 +133,13 @@ export default function FinesScreen() {
                     variant="heading"
                     size={14}
                     weight="600"
+                    numberOfLines={2}
                     style={{ marginTop: 4, lineHeight: 18 }}
                   >
                     {fine.offense}
                   </Text>
                 </View>
-                <Text variant="heading" size={22} weight="800" tracking={-1}>
+                <Text variant="heading" size={22} weight="800" tracking={-1} style={{ marginLeft: 12 }}>
                   {fine.amount}
                   <Text variant="mono" size={10} color={Colors.inkDim}> LEI</Text>
                 </Text>

@@ -83,27 +83,34 @@ export default function HomeScreen() {
           >
             <View style={styles.accentLine} />
             <View style={styles.instTop}>
-              <View>
+              <View style={{ flex: 1, minWidth: 0, marginRight: 12 }}>
                 <View style={styles.liveLabel}>
                   <View style={styles.liveDot} />
                   <Text variant="mono" size={10} tracking={2} color={Colors.inkDim}>
                     MAȘINĂ ACTIVĂ
                   </Text>
                 </View>
-                <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'baseline' }}>
+                <View style={{ marginTop: 10, flexDirection: 'row', alignItems: 'baseline', flexWrap: 'nowrap' }}>
                   <Text
                     variant="heading"
                     size={28}
                     tracking={-1}
-                    style={{ textTransform: 'uppercase' }}
+                    numberOfLines={1}
+                    style={{ textTransform: 'uppercase', flexShrink: 1 }}
                   >
                     {car.make}
                   </Text>
-                  <Text variant="serif" size={28} color={Colors.accent} style={{ marginLeft: 6 }}>
+                  <Text
+                    variant="serif"
+                    size={28}
+                    color={Colors.accent}
+                    numberOfLines={1}
+                    style={{ marginLeft: 6, flexShrink: 1 }}
+                  >
                     {car.model}
                   </Text>
                 </View>
-                <Text variant="mono" size={11} color={Colors.inkDim} tracking={1} style={{ marginTop: 4 }}>
+                <Text variant="mono" size={11} color={Colors.inkDim} tracking={1} numberOfLines={1} style={{ marginTop: 4 }}>
                   {car.plate}
                 </Text>
               </View>
@@ -169,11 +176,18 @@ export default function HomeScreen() {
                   <Text variant="mono" size={10} color={Colors.inkDimmer} tracking={1}>
                     {String(i + 1).padStart(2, '0')}
                   </Text>
-                  <View style={{ flex: 1, marginLeft: 14 }}>
-                    <Text variant="heading" size={14} weight="600">
+                  <View style={{ flex: 1, marginLeft: 14, minWidth: 0 }}>
+                    <Text variant="heading" size={14} weight="600" numberOfLines={1}>
                       {d.name}
                     </Text>
-                    <Text variant="mono" size={10} color={Colors.inkDim} tracking={0.5} style={{ marginTop: 2 }}>
+                    <Text
+                      variant="mono"
+                      size={10}
+                      color={Colors.inkDim}
+                      tracking={0.5}
+                      numberOfLines={1}
+                      style={{ marginTop: 2 }}
+                    >
                       {(d.issuer || d.type.toUpperCase())} · {format(new Date(d.expiryDate!), 'dd MMM yyyy', { locale: ro })}
                     </Text>
                   </View>
