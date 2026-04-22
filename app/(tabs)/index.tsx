@@ -82,7 +82,7 @@ export default function HomeScreen() {
         {car && (
           <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push({ pathname: '/car/[id]', params: { id: car.id } } as any)}
+            onPress={() => router.push(`/car/${car.id}` as any)}
             style={styles.instrument}
           >
             <View style={styles.accentLine} />
@@ -212,15 +212,15 @@ export default function HomeScreen() {
         <View style={styles.bento}>
           <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push('/fuel')}
+            onPress={() => router.push('/expenses')}
             style={[styles.bentoItem, styles.bentoAccent, styles.bentoTall]}
           >
             <View>
               <Text variant="mono" size={9} tracking={2} color={Colors.bg}>
                 CHELTUIELI · LUNA
               </Text>
-              <Text variant="heading" size={16} color={Colors.bg} style={{ marginTop: 8 }}>
-                Total aprilie
+              <Text variant="heading" size={16} color={Colors.bg} style={{ marginTop: 8 }} numberOfLines={1}>
+                {new Date().toLocaleDateString('ro-RO', { month: 'long' })}
               </Text>
             </View>
             <View>

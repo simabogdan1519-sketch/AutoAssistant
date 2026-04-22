@@ -84,10 +84,7 @@ export default function CarDetailScreen() {
   };
 
   const handleEdit = () => {
-    router.push({
-      pathname: '/car/edit/[id]',
-      params: { id: car.id },
-    } as any);
+    router.push(`/car/edit/${car.id}` as any);
   };
 
   const handleMenu = () => {

@@ -42,7 +42,7 @@ export default function GarajScreen() {
             <TouchableOpacity
               key={car.id}
               activeOpacity={0.9}
-              onPress={() => router.push({ pathname: '/car/[id]', params: { id: car.id } } as any)}
+              onPress={() => router.push(`/car/${car.id}` as any)}
               style={styles.carCard}
             >
               <View style={styles.carImage}>
