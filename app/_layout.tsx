@@ -77,18 +77,18 @@ function OnboardingGate() {
   const router = useRouter();
   const segments = useSegments();
   const onboardingCompleted = useStore((s) => s.user.onboardingCompleted);
+  const hasHydrated = useStore.persist.hasHydrated();
 
   useEffect(() => {
     // Așteaptă ca store-ul să se hidrateze din AsyncStorage
-    const timer = setTimeout(() => {
-      const currentRoute = segments.join('/');
-      if (!onboardingCompleted && currentRoute !== 'onboarding') {
-        router.replace('/onboarding');
-      }
-    }, 100);
+    if (!hasHydrated) return;
 
-    return () => clearTimeout(timer);
-  }, [onboardingCompleted, segments, router]);
+    const currentRoute = segments.join('/');
+    // Redirect DOAR dacă suntem în afara onboarding-ului și nu e completat
+    if (!onboardingCompleted && currentRoute !== 'onboarding') {
+      router.replace('/onboarding' as any);
+    }
+  }, [onboardingCompleted, hasHydrated, segments, router]);
 
   return null;
 }

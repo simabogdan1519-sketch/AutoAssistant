@@ -91,7 +91,9 @@ export default function EditProfileScreen() {
       name: name.trim(),
       avatar: avatar || undefined,
     });
-    router.back();
+    requestAnimationFrame(() => {
+      router.back();
+    });
   };
 
   return (

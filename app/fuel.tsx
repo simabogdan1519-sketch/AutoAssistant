@@ -87,7 +87,9 @@ export default function FuelScreen() {
       mileage: km,
     });
 
-    router.back();
+    requestAnimationFrame(() => {
+      router.back();
+    });
   };
 
   return (

@@ -58,19 +58,28 @@ export default function NewCarScreen() {
       return;
     }
 
-    addCar({
-      make: make.trim(),
-      model: model.trim(),
-      year: parseInt(year) || new Date().getFullYear(),
-      plate: plate.trim().toUpperCase(),
-      vin: vin.trim() || undefined,
-      fuelType,
-      tankCapacity: tankCapacity ? parseFloat(tankCapacity) : undefined,
-      currentMileage: parseInt(mileage.replace(/\D/g, '')) || 0,
-      profileImage: profileImage || undefined,
-    });
+    try {
+      addCar({
+        make: make.trim(),
+        model: model.trim(),
+        year: parseInt(year) || new Date().getFullYear(),
+        plate: plate.trim().toUpperCase(),
+        vin: vin.trim() || undefined,
+        fuelType,
+        tankCapacity: tankCapacity ? parseFloat(tankCapacity) : undefined,
+        currentMileage: parseInt(mileage.replace(/\D/g, '')) || 0,
+        profileImage: profileImage || undefined,
+      });
 
-    router.back();
+      // Navighez după un mic delay ca store-ul să termine de propagat
+      // Asta previne race condition-ul unde ecranul home începe re-render
+      // în timp ce modal-ul încearcă să se închidă → ecran gri gol pe Android
+      requestAnimationFrame(() => {
+        router.back();
+      });
+    } catch (err) {
+      Alert.alert('Eroare', 'Nu s-a putut salva mașina. Încearcă din nou.');
+    }
   };
 
   return (

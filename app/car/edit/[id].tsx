@@ -127,7 +127,9 @@ export default function EditCarScreen() {
         currentMileage: parsedMileage,
         profileImage: profileImage || undefined,
       });
-      router.back();
+      requestAnimationFrame(() => {
+        router.back();
+      });
     } catch (err) {
       Alert.alert('Eroare', 'Nu s-a putut salva. Încearcă din nou.');
     }

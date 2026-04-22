@@ -44,7 +44,9 @@ export default function NewFineScreen() {
       location: location || undefined,
       paid: false,
     });
-    router.back();
+    requestAnimationFrame(() => {
+      router.back();
+    });
   };
 
   return (

@@ -56,8 +56,11 @@ export default function OnboardingScreen() {
       name: name.trim() || 'Șofer',
       avatar: avatar || undefined,
     });
-    completeOnboarding();
-    router.replace('/');
+    // Completez onboarding DUPĂ navigare ca să nu triggeruim OnboardingGate în timp ce navigăm
+    setTimeout(() => {
+      completeOnboarding();
+    }, 100);
+    router.replace('/(tabs)' as any);
   };
 
   const next = () => {
@@ -70,8 +73,10 @@ export default function OnboardingScreen() {
 
   const skip = () => {
     updateUser({ name: 'Șofer' });
-    completeOnboarding();
-    router.replace('/');
+    setTimeout(() => {
+      completeOnboarding();
+    }, 100);
+    router.replace('/(tabs)' as any);
   };
 
   return (

@@ -98,7 +98,9 @@ export default function NewDocumentScreen() {
       fileUri: fileUri || undefined,
       notes: notes.trim() || undefined,
     });
-    router.back();
+    requestAnimationFrame(() => {
+      router.back();
+    });
   };
 
   return (

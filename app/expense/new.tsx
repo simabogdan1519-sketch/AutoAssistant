@@ -49,7 +49,9 @@ export default function NewExpenseScreen() {
       description,
       vendor: vendor || undefined,
     });
-    router.back();
+    requestAnimationFrame(() => {
+      router.back();
+    });
   };
 
   return (
