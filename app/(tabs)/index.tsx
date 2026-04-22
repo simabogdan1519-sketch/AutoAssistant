@@ -60,13 +60,17 @@ export default function HomeScreen() {
   const carFines = fines.filter((f) => f.carId === car?.id);
   const { total: activePoints } = calcActivePoints(carFines);
 
+  const user = useStore((s) => s.user);
+  const firstName = (user.name || 'Șofer').split(' ')[0];
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Header
         title="Salut,"
-        titleAccent="andrei"
+        titleAccent={firstName.toLowerCase()}
         eyebrow={today.toUpperCase()}
         rightIcon="notifications-outline"
+        onRightPress={() => router.push('/notificari')}
       />
       <ScrollView
         style={styles.scroll}
@@ -78,7 +82,7 @@ export default function HomeScreen() {
         {car && (
           <TouchableOpacity
             activeOpacity={0.9}
-            onPress={() => router.push(`/car/${car.id}`)}
+            onPress={() => router.push({ pathname: '/car/[id]', params: { id: car.id } } as any)}
             style={styles.instrument}
           >
             <View style={styles.accentLine} />

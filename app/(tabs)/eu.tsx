@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,6 +16,7 @@ import { useStore } from '@/lib/store';
 
 export default function EuScreen() {
   const router = useRouter();
+  const user = useStore((s) => s.user);
   const cars = useStore((s) => s.cars);
   const documents = useStore((s) => s.documents);
   const fines = useStore((s) => s.fines);
@@ -27,20 +29,47 @@ export default function EuScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.hero}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={40} color={Colors.inkDim} />
+        {/* Avatar card */}
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => router.push('/profil-edit')}
+          style={styles.hero}
+        >
+          <View style={styles.avatarWrap}>
+            {user.avatar ? (
+              <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Ionicons name="person" size={40} color={Colors.inkDim} />
+              </View>
+            )}
+            <View style={styles.editBadge}>
+              <Ionicons name="pencil" size={12} color={Colors.bg} />
+            </View>
           </View>
-          <Text variant="heading" size={22} tracking={-0.5} style={{ marginTop: 16 }}>
-            Șofer AutoAssistant
+
+          <Text
+            variant="heading"
+            size={22}
+            tracking={-0.5}
+            numberOfLines={1}
+            style={{ marginTop: 16, maxWidth: '90%', textAlign: 'center' }}
+          >
+            {user.name || 'Șofer'}
           </Text>
-          <Text variant="mono" size={10} tracking={1.5} color={Colors.inkDim} style={{ marginTop: 4 }}>
-            MEMBRU DIN APRILIE 2026
+          <Text
+            variant="mono"
+            size={10}
+            tracking={1.5}
+            color={Colors.inkDim}
+            style={{ marginTop: 4 }}
+          >
+            ATINGE PENTRU EDITARE
           </Text>
 
           <View style={styles.stats}>
             <View style={styles.statBlock}>
-              <Text variant="heading" size={28} tracking={-1}>
+              <Text variant="heading" size={22} tracking={-1}>
                 {cars.length}
               </Text>
               <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim}>
@@ -49,16 +78,16 @@ export default function EuScreen() {
             </View>
             <View style={styles.divider} />
             <View style={styles.statBlock}>
-              <Text variant="heading" size={28} tracking={-1}>
+              <Text variant="heading" size={22} tracking={-1}>
                 {documents.length}
               </Text>
               <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim}>
-                DOCUMENTE
+                DOCS
               </Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.statBlock}>
-              <Text variant="heading" size={28} tracking={-1}>
+              <Text variant="heading" size={22} tracking={-1}>
                 {fines.length}
               </Text>
               <Text variant="mono" size={9} tracking={1.5} color={Colors.inkDim}>
@@ -66,7 +95,7 @@ export default function EuScreen() {
               </Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.menu}>
           <MenuRow
@@ -78,7 +107,7 @@ export default function EuScreen() {
           <MenuRow
             icon="card-outline"
             title="Permis de conducere"
-            subtitle="ADAUGĂ · 10 ANI VALIDITATE"
+            subtitle="10 ANI VALIDITATE"
             onPress={() => router.push('/permis')}
           />
           <MenuRow
@@ -90,7 +119,7 @@ export default function EuScreen() {
           <MenuRow
             icon="cloud-upload-outline"
             title="Backup date"
-            subtitle="EXPORT JSON · GOOGLE DRIVE"
+            subtitle="EXPORT JSON"
             onPress={() => router.push('/backup')}
           />
           <MenuRow
@@ -102,7 +131,7 @@ export default function EuScreen() {
           <MenuRow
             icon="information-circle-outline"
             title="Despre aplicație"
-            subtitle="V1.0 · BUILD 2026.04.21"
+            subtitle="V1.0 · BUILD 2026.04.22"
             onPress={() => router.push('/despre')}
           />
         </View>
@@ -154,30 +183,62 @@ const styles = StyleSheet.create({
   hero: {
     alignItems: 'center',
     paddingVertical: 32,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.line,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.line,
+    borderRadius: 24,
+    marginTop: 8,
+    marginBottom: 20,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  avatarWrap: {
+    position: 'relative',
   },
   avatar: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: Colors.surface,
+  },
+  avatarPlaceholder: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: Colors.bg,
     borderWidth: 1,
     borderColor: Colors.line,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  editBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: Colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: Colors.surface,
+  },
   stats: {
-    marginTop: 32,
+    marginTop: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: Colors.line,
+    borderStyle: 'dashed',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
+    gap: 20,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
   },
-  statBlock: { alignItems: 'center' },
-  divider: { width: 1, height: 32, backgroundColor: Colors.line },
-  menu: {
-    marginTop: 20,
-  },
+  statBlock: { alignItems: 'center', minWidth: 60 },
+  divider: { width: 1, height: 28, backgroundColor: Colors.line },
+  menu: {},
 });
 
 const menuStyles = StyleSheet.create({

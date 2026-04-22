@@ -8,9 +8,11 @@ import type {
   Expense,
   ServiceRecord,
   Fine,
+  UserProfile,
 } from '@/types';
 
 type Store = {
+  user: UserProfile;
   cars: Car[];
   documents: CarDocument[];
   fuelEntries: FuelEntry[];
@@ -18,6 +20,10 @@ type Store = {
   serviceRecords: ServiceRecord[];
   fines: Fine[];
   activeCarId: string | null;
+
+  // User actions
+  updateUser: (updates: Partial<UserProfile>) => void;
+  completeOnboarding: () => void;
 
   // Car actions
   addCar: (car: Omit<Car, 'id' | 'createdAt'>) => string;
@@ -53,6 +59,12 @@ const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2
 export const useStore = create<Store>()(
   persist(
     (set, get) => ({
+      user: {
+        name: '',
+        avatar: undefined,
+        createdAt: Date.now(),
+        onboardingCompleted: false,
+      },
       cars: [],
       documents: [],
       fuelEntries: [],
@@ -60,6 +72,16 @@ export const useStore = create<Store>()(
       serviceRecords: [],
       fines: [],
       activeCarId: null,
+
+      updateUser: (updates) =>
+        set((state) => ({
+          user: { ...state.user, ...updates },
+        })),
+
+      completeOnboarding: () =>
+        set((state) => ({
+          user: { ...state.user, onboardingCompleted: true },
+        })),
 
       addCar: (carData) => {
         const id = genId();

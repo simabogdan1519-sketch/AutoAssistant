@@ -1,5 +1,12 @@
 export type FuelType = 'Diesel' | 'Benzină' | 'GPL' | 'Hybrid' | 'Electric';
 
+export type UserProfile = {
+  name: string;
+  avatar?: string;
+  createdAt: number;
+  onboardingCompleted: boolean;
+};
+
 export type Car = {
   id: string;
   make: string;

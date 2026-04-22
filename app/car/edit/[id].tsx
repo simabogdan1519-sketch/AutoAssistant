@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -22,50 +22,79 @@ import type { FuelType } from '@/types';
 const FUEL_TYPES: FuelType[] = ['Diesel', 'Benzină', 'GPL', 'Hybrid', 'Electric'];
 
 export default function EditCarScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{ id: string }>();
+  const id = params.id;
   const router = useRouter();
+
   const car = useStore((s) => s.cars.find((c) => c.id === id));
   const updateCar = useStore((s) => s.updateCar);
 
-  const [make, setMake] = useState(car?.make || '');
-  const [model, setModel] = useState(car?.model || '');
-  const [year, setYear] = useState(String(car?.year || ''));
-  const [plate, setPlate] = useState(car?.plate || '');
-  const [vin, setVin] = useState(car?.vin || '');
-  const [fuelType, setFuelType] = useState<FuelType>(car?.fuelType || 'Diesel');
-  const [tankCapacity, setTankCapacity] = useState(
-    car?.tankCapacity ? String(car.tankCapacity) : ''
-  );
-  const [mileage, setMileage] = useState(String(car?.currentMileage || ''));
-  const [profileImage, setProfileImage] = useState<string | null>(car?.profileImage || null);
+  const [make, setMake] = useState('');
+  const [model, setModel] = useState('');
+  const [year, setYear] = useState('');
+  const [plate, setPlate] = useState('');
+  const [vin, setVin] = useState('');
+  const [fuelType, setFuelType] = useState<FuelType>('Diesel');
+  const [tankCapacity, setTankCapacity] = useState('');
+  const [mileage, setMileage] = useState('');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  if (!car) {
+  // Inițializare sigură într-un useEffect (nu în useState)
+  useEffect(() => {
+    if (car && !initialized) {
+      setMake(car.make || '');
+      setModel(car.model || '');
+      setYear(String(car.year || ''));
+      setPlate(car.plate || '');
+      setVin(car.vin || '');
+      setFuelType(car.fuelType || 'Diesel');
+      setTankCapacity(car.tankCapacity ? String(car.tankCapacity) : '');
+      setMileage(String(car.currentMileage || ''));
+      setProfileImage(car.profileImage || null);
+      setInitialized(true);
+    }
+  }, [car, initialized]);
+
+  if (!car || !id) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <Header title="Eroare" showBack />
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <Text variant="body" color={Colors.inkDim}>
-            Mașina nu există.
+            Mașina nu a fost găsită.
           </Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{ marginTop: 20, padding: 12 }}
+          >
+            <Text variant="mono" size={11} tracking={1} color={Colors.accent}>
+              ← ÎNAPOI
+            </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
 
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permisiune necesară', 'Avem nevoie de acces la galerie pentru a schimba poza.');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled && result.assets[0]) {
-      setProfileImage(result.assets[0].uri);
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permisiune necesară', 'Avem nevoie de acces la galerie pentru a schimba poza.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setProfileImage(result.assets[0].uri);
+      }
+    } catch (err) {
+      Alert.alert('Eroare', 'Nu s-a putut selecta poza.');
     }
   };
 
@@ -77,7 +106,7 @@ export default function EditCarScreen() {
   };
 
   const handleSave = () => {
-    if (!make || !model || !plate || !mileage) {
+    if (!make.trim() || !model.trim() || !plate.trim() || !mileage) {
       Alert.alert('Date lipsă', 'Completează cel puțin marca, modelul, numărul și kilometrajul.');
       return;
     }
@@ -86,27 +115,30 @@ export default function EditCarScreen() {
     const parsedMileage = parseInt(mileage.replace(/\D/g, '')) || 0;
     const parsedTank = tankCapacity ? parseFloat(tankCapacity) : undefined;
 
-    updateCar(car.id, {
-      make: make.trim(),
-      model: model.trim(),
-      year: isNaN(parsedYear) ? car.year : parsedYear,
-      plate: plate.trim().toUpperCase(),
-      vin: vin.trim() || undefined,
-      fuelType,
-      tankCapacity: parsedTank,
-      currentMileage: parsedMileage,
-      profileImage: profileImage || undefined,
-    });
-
-    router.back();
+    try {
+      updateCar(car.id, {
+        make: make.trim(),
+        model: model.trim(),
+        year: isNaN(parsedYear) ? car.year : parsedYear,
+        plate: plate.trim().toUpperCase(),
+        vin: vin.trim() || undefined,
+        fuelType,
+        tankCapacity: parsedTank,
+        currentMileage: parsedMileage,
+        profileImage: profileImage || undefined,
+      });
+      router.back();
+    } catch (err) {
+      Alert.alert('Eroare', 'Nu s-a putut salva. Încearcă din nou.');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Header
         title="Editează"
-        titleAccent={car.model}
-        eyebrow={car.plate}
+        titleAccent={car.model || ''}
+        eyebrow={car.plate || ''}
         showBack
       />
 
@@ -131,13 +163,13 @@ export default function EditCarScreen() {
               <Ionicons name={profileImage ? 'pencil' : 'add'} size={16} color={Colors.bg} />
             </View>
           </TouchableOpacity>
-          {profileImage && (
+          {profileImage ? (
             <TouchableOpacity onPress={removeImage} style={styles.removeImgBtn}>
               <Text variant="mono" size={10} tracking={1.2} color={Colors.danger}>
                 ELIMINĂ POZA
               </Text>
             </TouchableOpacity>
-          )}
+          ) : null}
           <Text
             variant="mono"
             size={10}

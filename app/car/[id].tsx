@@ -23,22 +23,47 @@ import {
 } from '@/lib/utils';
 
 export default function CarDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{ id: string }>();
+  const id = params.id;
   const router = useRouter();
+
+  // Defensive selector - evităm recreerea obiectului la fiecare render
   const car = useStore((s) => s.cars.find((c) => c.id === id));
-  const documents = useStore((s) => s.documents.filter((d) => d.carId === id));
+  const documents = useStore((s) =>
+    id ? s.documents.filter((d) => d.carId === id) : []
+  );
   const deleteCar = useStore((s) => s.deleteCar);
 
-  if (!car) {
+  // Early return sigur
+  if (!car || !id) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <Header title="Eroare" showBack />
         <View style={styles.center}>
-          <Text variant="body" color={Colors.inkDim}>Mașina nu există.</Text>
+          <Text variant="body" color={Colors.inkDim}>
+            Mașina nu a fost găsită.
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={{ marginTop: 20, padding: 12 }}
+          >
+            <Text variant="mono" size={11} tracking={1} color={Colors.accent}>
+              ← ÎNAPOI
+            </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
+
+  // Safe defaults pentru toate câmpurile care pot fi undefined
+  const safeMake = car.make || 'Necunoscut';
+  const safeModel = car.model || '';
+  const safePlate = car.plate || '—';
+  const safeFuel = car.fuelType || 'Benzină';
+  const safeMileage = car.currentMileage || 0;
+  const safeYear = car.year || new Date().getFullYear();
+  const safeTank = car.tankCapacity;
 
   const handleDelete = () => {
     Alert.alert(
@@ -58,29 +83,37 @@ export default function CarDetailScreen() {
     );
   };
 
+  const handleEdit = () => {
+    router.push({
+      pathname: '/car/edit/[id]',
+      params: { id: car.id },
+    } as any);
+  };
+
   const handleMenu = () => {
     Alert.alert(
       'Opțiuni',
-      car.make + ' ' + car.model,
+      `${safeMake} ${safeModel}`.trim(),
       [
-        { text: 'Editează', onPress: () => router.push(`/car/edit/${car.id}`) },
+        { text: 'Editează', onPress: handleEdit },
         { text: 'Șterge', style: 'destructive', onPress: handleDelete },
         { text: 'Anulează', style: 'cancel' },
       ]
     );
   };
 
-  // Fix pentru VIN safe display
-  const vinDisplay = car.vin && car.vin.length > 0
-    ? `...${car.vin.slice(-6)}`
-    : null;
+  // Safe VIN display
+  const vinDisplay =
+    car.vin && typeof car.vin === 'string' && car.vin.length > 0
+      ? `...${car.vin.slice(-6)}`
+      : null;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Header
-        title={car.make}
-        titleAccent={car.model}
-        eyebrow={car.plate}
+        title={safeMake}
+        titleAccent={safeModel || undefined}
+        eyebrow={safePlate}
         showBack
         rightIcon="ellipsis-horizontal"
         onRightPress={handleMenu}
@@ -101,7 +134,7 @@ export default function CarDetailScreen() {
           )}
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => router.push(`/car/edit/${car.id}`)}
+            onPress={handleEdit}
             style={styles.editBtn}
           >
             <Ionicons name="create-outline" size={14} color={Colors.ink} />
@@ -111,25 +144,25 @@ export default function CarDetailScreen() {
           </TouchableOpacity>
           <View style={styles.plateBadge}>
             <Text variant="mono" size={11} color={Colors.accent} tracking={1.2} weight="500">
-              {car.plate}
+              {safePlate}
             </Text>
           </View>
-          {vinDisplay && (
+          {vinDisplay ? (
             <View style={styles.vinBadge}>
               <Text variant="mono" size={9} color={Colors.inkDim} tracking={1}>
                 VIN · {vinDisplay}
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
 
         <View style={styles.specs}>
-          <SpecRow label="Marcă" value={car.make} />
-          <SpecRow label="Model" value={car.model} />
-          <SpecRow label="An fabricație" value={String(car.year)} />
-          <SpecRow label="Combustibil" value={car.fuelType} />
-          {car.tankCapacity ? <SpecRow label="Rezervor" value={`${car.tankCapacity} L`} /> : null}
-          <SpecRow label="Kilometraj" value={`${car.currentMileage.toLocaleString('ro-RO')} km`} />
+          <SpecRow label="Marcă" value={safeMake} />
+          {safeModel ? <SpecRow label="Model" value={safeModel} /> : null}
+          <SpecRow label="An fabricație" value={String(safeYear)} />
+          <SpecRow label="Combustibil" value={safeFuel} />
+          {safeTank ? <SpecRow label="Rezervor" value={`${safeTank} L`} /> : null}
+          <SpecRow label="Kilometraj" value={`${safeMileage.toLocaleString('ro-RO')} km`} />
         </View>
 
         <SectionHeader
@@ -172,7 +205,7 @@ export default function CarDetailScreen() {
                   </View>
                   <View style={styles.docInfo}>
                     <Text variant="heading" size={14} weight="500" numberOfLines={1}>
-                      {d.name}
+                      {d.name || 'Fără nume'}
                     </Text>
                     <Text
                       variant="mono"
@@ -182,7 +215,7 @@ export default function CarDetailScreen() {
                       numberOfLines={1}
                       style={{ marginTop: 2 }}
                     >
-                      {d.issuer ? d.issuer.toUpperCase() : d.type.toUpperCase()}
+                      {d.issuer ? d.issuer.toUpperCase() : (d.type || 'DOC').toUpperCase()}
                       {d.expiryDate ? ` · EXP. ${formatShortDate(d.expiryDate)}` : ''}
                     </Text>
                   </View>
@@ -224,7 +257,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: Spacing.xl, paddingBottom: 80 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   heroImg: {
     aspectRatio: 16 / 10,
     borderWidth: 1,

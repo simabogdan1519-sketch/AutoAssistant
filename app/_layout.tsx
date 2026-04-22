@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
   useFonts as useArchivo,
@@ -23,6 +23,7 @@ import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Colors } from '@/constants/theme';
+import { useStore } from '@/lib/store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -44,8 +45,9 @@ export default function RootLayout() {
     InstrumentSerif_400Regular_Italic,
   });
 
-  // Dacă fonturile eșuează, continuăm oricum — RN va folosi fontul sistemului
-  const loaded = (archivoLoaded && jbLoaded && serifLoaded) || !!(archivoError || jbError || serifError);
+  const loaded =
+    (archivoLoaded && jbLoaded && serifLoaded) ||
+    !!(archivoError || jbError || serifError);
 
   useEffect(() => {
     if (loaded) {
@@ -58,28 +60,35 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.bg }}>
       <StatusBar style="light" />
+      <OnboardingGate />
       <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: Colors.bg },
           animation: 'slide_from_right',
         }}
-      >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="car/new" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="car/[id]" />
-        <Stack.Screen name="car/edit/[id]" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="fuel" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="fines" />
-        <Stack.Screen name="fine/new" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="document/new" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="expense/new" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="permis" />
-        <Stack.Screen name="notificari" />
-        <Stack.Screen name="backup" />
-        <Stack.Screen name="ghid" />
-        <Stack.Screen name="despre" />
-      </Stack>
+      />
     </GestureHandlerRootView>
   );
+}
+
+// Redirect la onboarding dacă nu e completat
+function OnboardingGate() {
+  const router = useRouter();
+  const segments = useSegments();
+  const onboardingCompleted = useStore((s) => s.user.onboardingCompleted);
+
+  useEffect(() => {
+    // Așteaptă ca store-ul să se hidrateze din AsyncStorage
+    const timer = setTimeout(() => {
+      const currentRoute = segments.join('/');
+      if (!onboardingCompleted && currentRoute !== 'onboarding') {
+        router.replace('/onboarding');
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [onboardingCompleted, segments, router]);
+
+  return null;
 }
