@@ -33,8 +33,10 @@ export default function HomeScreen() {
   const fuelEntries = useStore((s) => s.fuelEntries);
   const expenses = useStore((s) => s.expenses);
   const fines = useStore((s) => s.fines);
+  const user = useStore((s) => s.user);
 
   const today = useMemo(() => format(new Date(), 'EEEE dd MMM', { locale: ro }), []);
+  const firstName = (user.name || 'Șofer').split(' ')[0];
 
   if (cars.length === 0) {
     return <EmptyState />;
@@ -59,9 +61,6 @@ export default function HomeScreen() {
 
   const carFines = fines.filter((f) => f.carId === car?.id);
   const { total: activePoints } = calcActivePoints(carFines);
-
-  const user = useStore((s) => s.user);
-  const firstName = (user.name || 'Șofer').split(' ')[0];
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
